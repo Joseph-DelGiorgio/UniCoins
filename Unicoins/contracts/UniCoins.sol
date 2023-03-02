@@ -130,19 +130,19 @@ contract UNCollaboration {
     }
 
    function completeTask(uint256 _taskId) public {
-    require(collaborators[msg.sender] == true, "Only collaborators can complete tasks.");
-    require(tasks[_taskId].completed == false, "This task has already been completed.");
-    tasks[_taskId].completed = true;
-    tasks[_taskId].collaborator = msg.sender;
-    balances[msg.sender].balance += tasks[_taskId].reward;
+        require(collaborators[msg.sender] == true, "Only collaborators can complete tasks.");
+        require(tasks[_taskId].completed == false, "This task has already been completed.");
+        tasks[_taskId].completed = true;
+        tasks[_taskId].collaborator = msg.sender;
+        balances[msg.sender].balance += tasks[_taskId].reward;
     }
 
-  function addBadge(string memory _badgeDescription, uint256 _hoursContributed) public {
-    require(collaborators[msg.sender] == true, "Only collaborators can add badges.");
-    balances[msg.sender].badges[msg.sender] = Badge(_badgeDescription, _hoursContributed);
+   function addBadge(string memory _badgeDescription, uint256 _hoursContributed) public {
+        require(collaborators[msg.sender] == true, "Only collaborators can add badges.");
+        balances[msg.sender].badges[msg.sender] = Badge(_badgeDescription, _hoursContributed);
    }
 
   function getBadge(address _collaborator) public view returns (string memory) {
-    return balances[_collaborator].badges[_collaborator].badgeDescription;
+        return balances[_collaborator].badges[_collaborator].badgeDescription;
     }
 }
