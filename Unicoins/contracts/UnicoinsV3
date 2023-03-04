@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./UNBadge.sol";
+
+contract UNCollaboration is ERC20 {
+struct CollaborationTask {
+address projectManager;
+string taskDescription;
+uint256 reward;
+bool completed;
+address collaborator;
+bool authorized;
+}
+
+
+struct Badge {
+    string badgeDescription;
+    uint256 hoursContributed;
+}
+
+struct UNicoinBalance {
+    uint256 balance;
+    mapping(address => Badge) badges;
+    uint256 hoursContributed;
+}
+
+mapping(address => UNicoinBalance) private balances;
+
+mapping(address => bool) public collaborators;
+mapping(address => bool) public projectManagers;
+
+uint256 public constant TOTAL_UNICOINS = 21000000;
+string public constant UNICOIN_SYMBOL = "UNC";
+string public constant UNICOIN_NAME = "UNCollaboration Coin";
+uint8 public constant UNICOIN_DECIMALS = 18;
+
+uint256 private _totalSupply;
+
+CollaborationTask[] public tasks;
+
+UNBadge public badgeContract;
+
+event TaskAdded(uint256 indexed taskId, address indexed projectManager, string taskDescription, uint256 reward, address collaborator);
+event TaskCompleted(uint256 indexed taskId, address indexed collaborator, uint256 reward);
+event CollaboratorAdded(address indexed collaborator);
+event ProjectManagerAdded(address indexed projectManager);
+
+constructor(address badgeContractAddress) ERC20(UNICOIN_NAME, UNICOIN_SYMBOL) {
+    _totalSupply = TOTAL_UNICOINS * 10 ** UNICOIN_DECIMALS;
+    _mint(msg.sender, _totalSupply);
+
+    badgeContract = UNBadge(badgeContractAddress);
+
+    projectManagers[msg.sender] = true;
+    emit ProjectManagerAdded(msg.sender);
+}
+
+function addTask(string memory taskDescription, uint256 reward, address collaborator) public {
+    require(projectManagers[msg.sender], "Only project managers can add tasks");
+    uint256 taskId = tasks.length;
+    tasks.push(CollaborationTask(msg.sender, taskDescription, reward, false, collaborator, false));
+    emit TaskAdded(taskId, msg.sender, taskDescription, reward, collaborator);
+}
+
+function completeTask(uint256 taskIndex) public {
+    CollaborationTask storage task = tasks[taskIndex];
+    require(task.collaborator == msg.sender, "Only the assigned collaborator can complete the task");
+    require(task.completed == false, "Task is already completed");
+    task.completed = true;
+    UNicoinBalance storage collaboratorBalance = balances[msg.sender];
+    collaboratorBalance.balance += task.reward;
+    emit TaskCompleted(taskIndex, msg.sender, task.reward);
+}
+
+
+function awardBadge(address collaborator, uint256 tokenId, string memory badgeDescription, uint256 hoursContributed) public {
+    require(projectManagers[msg.sender], "Only project managers can award badges");
+    UNicoinBalance storage collaboratorBalance = balances[collaborator];
+    collaboratorBalance.badges[msg.sender] = Badge(badgeDescription, hoursContributed);
+    badgeContract.mint(msg.sender, tokenId, collaboratorBalance.hoursContributed, new string[](0), new address[](0), 0);
+}
+
+function getBadge(address collaborator, address projectManager) public view returns (string memory, uint256) {
+    require(projectManagers[projectManager], "Invalid project manager address");
+    return (balances[collaborator].badges[projectManager].badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
+}
+function addProjectManager(address projectManager) public {
+    require(projectManagers[msg.sender], "Only project managers can add new project managers");
+    projectManagers[projectManager] = true;
+}
+
+function addCollaborator(address collaborator) public {
+    require(projectManagers[msg.sender], "Only project managers can add new collaborators");
+    collaborators[collaborator] = true;
+}
+
+function removeCollaborator(address collaborator) public {
+    require(projectManagers[msg.sender], "Only project managers can remove collaborators");
+    collaborators[collaborator] = false;
+}
+
+function authorizeTask(uint256 taskIndex) public {
+    CollaborationTask storage task = tasks[taskIndex];
+    require(projectManagers[msg.sender], "Only project managers can authorize tasks");
+    require(task.completed == true, "Task is not completed");
+    require(task.authorized == false, "Task is already authorized");
+    task.authorized = true;
+    UNicoinBalance storage collaboratorBalance = balances[task.collaborator];
+    collaboratorBalance.hoursContributed += task.reward;
+}
+
+function getTask(uint256 taskIndex) public view returns (address, string memory, uint256, bool, address, bool) {
+    CollaborationTask storage task = tasks[taskIndex];
+    return (task.projectManager, task.taskDescription, task.reward, task.completed, task.collaborator, task.authorized);
+}
+
+function getCollaboratorBalance(address collaborator) public view returns (uint256) {
+    return balances[collaborator].balance;
+}
+}
