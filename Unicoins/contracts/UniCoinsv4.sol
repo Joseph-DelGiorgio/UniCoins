@@ -82,11 +82,10 @@ contract UNCollaboration is ERC20 {
     }
 
     function getBadge(address collaborator, address projectManager) public view returns (string memory, uint256) {
-        require(projectManagers[projectManager], "Invalid project manager address");
-        return (balances[collaborator].badges[projectManager].
+    require(projectManagers[projectManager], "Invalid project manager address");
+    return (balances[collaborator].badges[projectManager].badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
+    }
 
-        badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
-}
 
 
 function addCollaborator(address collaborator) public {
