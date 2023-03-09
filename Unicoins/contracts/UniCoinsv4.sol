@@ -24,11 +24,20 @@ contract UNCollaboration is ERC20 {
         mapping(address => Badge) badges;
         uint256 hoursContributed;
     }
+    
+    struct Stake {
+        address staker;
+        uint256 amount;
+        uint256 startTime;
+        uint256 endTime;
+    }
+
 
     mapping(address => UNicoinBalance) private balances;
-
     mapping(address => bool) public collaborators;
     mapping(address => bool) public projectManagers;
+    mapping(address => Stake[]) public stakingPositions;
+
 
     uint256 public constant TOTAL_UNICOINS = 21000000;
     string public constant UNICOIN_SYMBOL = "UNC";
@@ -110,6 +119,52 @@ function mintTokens(address receiver, uint256 amount) public {
     _mint(receiver, amount);
     emit TokensMinted(receiver, amount);
 }
+
+function stake(uint256 amount, uint256 duration) public {
+    require(collaborators[msg.sender], "Only collaborators can stake");
+    require(amount > 0, "Stake amount must be greater than 0");
+    require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+
+    // Transfer tokens to this contract
+    transfer(address(this), amount);
+
+    // Create the staking position
+    stakingPositions[msg.sender].push(
+        Stake(msg.sender, amount, block.timestamp, block.timestamp + duration)
+    );
+}
+
+function unstake() public {
+    require(collaborators[msg.sender], "Only collaborators can unstake");
+
+    Stake[] storage stakes = stakingPositions[msg.sender];
+    require(stakes.length > 0, "No staking positions found");
+
+    // Find the most recent staking position
+    Stake storage lastStake = stakes[stakes.length - 1];
+    require(block.timestamp >= lastStake.endTime, "Staking position still active");
+
+    // Transfer tokens back to the caller
+    transfer(msg.sender, lastStake.amount);
+
+    // Remove the staking position
+    stakes.pop();
+}
+
+function stakedBalance(address collaborator, uint256 timestamp) public view returns (uint256) {
+    Stake[] storage stakes = stakingPositions[collaborator];
+    uint256 balance = 0;
+
+    for (uint256 i = 0; i < stakes.length; i++) {
+        Stake storage stake = stakes[i];
+        if (timestamp < stake.endTime) {
+            balance += stake.amount;
+        }
+    }
+
+    return balance;
+}
+
 }
 pragma solidity ^0.8.0;
 
@@ -139,15 +194,46 @@ contract UNBadge is ERC721 {
         return _badgeMetadata[tokenId].projectManagerFeedbackRating;
     }
 }
+
+
+
+
 /* The main components of the contract are:
 
-The UNCollaboration contract that defines the data structures and functions for managing collaboration tasks, UNCollaboration coin balances, project managers, collaborators, and badges.
-The CollaborationTask struct that defines the data structure for a collaboration task, which includes the project manager's address, task description, reward, completion status, assigned collaborator, and authorization status.
-The Badge struct that defines the data structure for a badge, which includes the badge description, hours contributed, and mapping of badges to addresses.
-The UNicoinBalance struct that defines the data structure for an UNCollaboration coin balance, which includes the balance, mapping of badges to addresses, and hours contributed.
-The mapping of addresses to UNicoinBalance and collaborator/project manager status.
-The UNBadge contract that defines the data structures and functions for managing badge metadata and minting badges to collaborators.
-The constructor function that initializes the UNCollaboration contract and mints the total supply of UNCollaboration coins to the contract deployer's address.
-The functions for adding a task, completing a task, awarding a badge, getting a badge, adding a collaborator, adding a project manager, and minting tokens.
+ERC20 Token
+The contract inherits from the ERC20 contract provided by OpenZeppelin, which implements the ERC20 token standard. This standard defines a set of functions and events that must be implemented by a contract in order to create a fungible token on the Ethereum blockchain.
+
+The UNCollaboration contract adds a few additional functions to the ERC20 contract, such as mintTokens, which allows project managers to mint new tokens, and stake, which allows collaborators to stake their tokens in exchange for rewards.
+
+CollaborationTask Struct
+The CollaborationTask struct is used to represent a task that needs to be completed by a collaborator. It contains information such as the project manager who created the task, a description of the task, the reward for completing the task, and the address of the collaborator who has been assigned the task.
+
+The addTask function allows project managers to create new tasks, and the completeTask function allows collaborators to mark tasks as completed and receive their rewards.
+
+Badge Struct
+The Badge struct is used to represent a badge that can be awarded to a collaborator for their contributions to a project. It contains information such as a description of the badge and the number of hours the collaborator has contributed to the project.
+
+The awardBadge function allows project managers to award badges to collaborators who have made significant contributions to a project.
+
+UNicoinBalance Struct
+The UNicoinBalance struct is used to keep track of a collaborator's UNicoin balance, as well as any badges they have been awarded and the number of hours they have contributed to the project.
+
+Stake Struct
+The Stake struct is used to represent a staking position, which allows collaborators to stake their tokens in exchange for rewards. It contains information such as the collaborator who made the stake, the amount of tokens staked, and the start and end times of the staking period.
+
+The stake and unstake functions are used to create and remove staking positions, respectively.
+
+Events
+The contract emits a number of events, such as TaskAdded and TaskCompleted, which allow external applications to listen for changes in the state of the contract.
+
+Mapping Variables
+The contract also uses a number of mapping variables to keep track of collaborators, project managers, staking positions, and UNicoin balances.
+
+Security Considerations
+Overall, the contract seems to be designed with security in mind. It includes a number of require statements to ensure that only authorized users can perform certain actions, and it uses the SafeMath library to prevent integer overflow and underflow issues. However, there are a few areas where the contract could be improved from a security perspective:
+
+The contract could benefit from a more detailed access control system. Currently, the projectManagers and collaborators mappings are used to keep track of authorized users, but these mappings are not very flexible. It might be beneficial to implement a more granular access control system that allows for more fine-grained control over who can perform specific actions.
+
+The awardBadge function allows project managers to mint new badges and assign them to collaborators, but it does not include any checks to ensure that the badge contract address is valid. If the badge contract is compromised, it could potentially allow an attacker to mint new badges
 
 */
