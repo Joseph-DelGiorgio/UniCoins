@@ -85,7 +85,7 @@ contract UNCollaboration is ERC20 {
         require(projectManagers[projectManager], "Invalid project manager address");
         return (balances[collaborator].badges[projectManager].
 
-badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
+        badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
 }
 
 
@@ -151,3 +151,25 @@ contract UNBadge is ERC721 {
         return _badgeMetadata[tokenId].projectManagerFeedbackRating;
     }
 }
+
+/* The main components of the contract are:
+
+CollaborationTask struct to represent a task that can be assigned to a collaborator and completed for a reward.
+Badge struct to represent a badge that can be awarded to a collaborator for their contributions.
+UNicoinBalance struct to represent a balance of UNCoins for each collaborator.
+balances mapping to store the UNicoinBalance for each collaborator.
+tasks array to store all tasks created by project managers.
+collaborators mapping to store whether an address is a collaborator or not.
+projectManagers mapping to store whether an address is a project manager or not.
+badgeContract address to store the address of the UNBadge contract used to mint badges.
+addTask function to allow project managers to add tasks.
+completeTask function to allow collaborators to complete tasks and receive a reward.
+awardBadge function to allow project managers to award badges to collaborators for their contributions.
+addCollaborator function to allow project managers to add collaborators.
+addProjectManager function to allow project managers to add other project managers.
+mint function to allow project managers to mint new UNCoins.
+balanceOf function to allow users to check their UNCoin balance.
+hoursContributed function to allow users to check their total hours contributed to tasks.
+getBadge function to allow users to get information about a badge awarded to them by a specific project manager.
+
+*/
