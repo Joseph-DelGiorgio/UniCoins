@@ -1,8 +1,9 @@
+main components of this code?
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./UNBadge.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract UNCollaboration is ERC20 {
     struct CollaborationTask {
@@ -75,22 +76,23 @@ contract UNCollaboration is ERC20 {
     }
 
     function awardBadge(address collaborator, uint256 tokenId, string memory badgeDescription, uint256 hoursContributed) public {
-        require(projectManagers[msg.sender], "Only project managers can award badges");
-        UNicoinBalance storage collaboratorBalance = balances[collaborator];
-        collaboratorBalance.badges[msg.sender] = Badge(badgeDescription, hoursContributed);
-        badgeContract.mint(msg.sender, tokenId, collaboratorBalance.hoursContributed, new string[](0), new address[](0), 0);
+    require(projectManagers[msg.sender], "Only project managers can award badges");
+    UNicoinBalance storage collaboratorBalance = balances[collaborator];
+    collaboratorBalance.badges[msg.sender] = Badge(badgeDescription, hoursContributed);
+    badgeContract.mint(msg.sender, tokenId, hoursContributed, 0);
     }
+
+
+
 
     function getBadge(address collaborator, address projectManager) public view returns (string memory, uint256) {
-    require(projectManagers[projectManager], "Invalid project manager address");
-    return (balances[collaborator].badges[projectManager].badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
+        require(projectManagers[projectManager], "Invalid project manager address");
+        return (balances[collaborator].badges[projectManager].badgeDescription, balances[collaborator].badges[projectManager].hoursContributed);
     }
-
 
 
 function addCollaborator(address collaborator) public {
     require(projectManagers[msg.sender], "Only project managers can add collaborators");
-    require(!collaborators[collaborator], "Collaborator is already added");
     collaborators[collaborator] = true;
     balances[collaborator].balance = 0;
     balances[collaborator].hoursContributed = 0;
@@ -98,30 +100,18 @@ function addCollaborator(address collaborator) public {
 }
 
 function addProjectManager(address projectManager) public {
-    require(projectManagers[msg.sender], "Only project managers can add project managers");
-    require(!projectManagers[projectManager], "Project manager is already added");
+    require(projectManagers[msg.sender], "Only existing project managers can add new project managers");
     projectManagers[projectManager] = true;
     emit ProjectManagerAdded(projectManager);
 }
 
-function mint(address receiver, uint256 amount) public {
+function mintTokens(address receiver, uint256 amount) public {
     require(projectManagers[msg.sender], "Only project managers can mint tokens");
-    require(totalSupply() + amount <= _totalSupply, "Total supply exceeded");
+    require(totalSupply() + amount <= TOTAL_UNICOINS * 10 ** UNICOIN_DECIMALS, "Minting would exceed total supply");
     _mint(receiver, amount);
     emit TokensMinted(receiver, amount);
 }
-
-function balanceOf(address account) public view override returns (uint256) {
-    return balances[account].balance;
 }
-
-function hoursContributed(address account) public view returns (uint256) {
-    return balances[account].hoursContributed;
-}
-}
-
-
-
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -150,25 +140,15 @@ contract UNBadge is ERC721 {
         return _badgeMetadata[tokenId].projectManagerFeedbackRating;
     }
 }
-
 /* The main components of the contract are:
 
-CollaborationTask struct to represent a task that can be assigned to a collaborator and completed for a reward.
-Badge struct to represent a badge that can be awarded to a collaborator for their contributions.
-UNicoinBalance struct to represent a balance of UNCoins for each collaborator.
-balances mapping to store the UNicoinBalance for each collaborator.
-tasks array to store all tasks created by project managers.
-collaborators mapping to store whether an address is a collaborator or not.
-projectManagers mapping to store whether an address is a project manager or not.
-badgeContract address to store the address of the UNBadge contract used to mint badges.
-addTask function to allow project managers to add tasks.
-completeTask function to allow collaborators to complete tasks and receive a reward.
-awardBadge function to allow project managers to award badges to collaborators for their contributions.
-addCollaborator function to allow project managers to add collaborators.
-addProjectManager function to allow project managers to add other project managers.
-mint function to allow project managers to mint new UNCoins.
-balanceOf function to allow users to check their UNCoin balance.
-hoursContributed function to allow users to check their total hours contributed to tasks.
-getBadge function to allow users to get information about a badge awarded to them by a specific project manager.
+The UNCollaboration contract that defines the data structures and functions for managing collaboration tasks, UNCollaboration coin balances, project managers, collaborators, and badges.
+The CollaborationTask struct that defines the data structure for a collaboration task, which includes the project manager's address, task description, reward, completion status, assigned collaborator, and authorization status.
+The Badge struct that defines the data structure for a badge, which includes the badge description, hours contributed, and mapping of badges to addresses.
+The UNicoinBalance struct that defines the data structure for an UNCollaboration coin balance, which includes the balance, mapping of badges to addresses, and hours contributed.
+The mapping of addresses to UNicoinBalance and collaborator/project manager status.
+The UNBadge contract that defines the data structures and functions for managing badge metadata and minting badges to collaborators.
+The constructor function that initializes the UNCollaboration contract and mints the total supply of UNCollaboration coins to the contract deployer's address.
+The functions for adding a task, completing a task, awarding a badge, getting a badge, adding a collaborator, adding a project manager, and minting tokens.
 
 */
