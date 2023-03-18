@@ -42,12 +42,7 @@ contract UNCollaboration is ERC20, Ownable, ReentrancyGuard {
     mapping(address => bool) public projectManagers;
     mapping(address => StakingPosition[]) public stakingPositions;
 
-    uint256 public constant TOTAL_UNICOINS = 21000000;
-    string public constant UNICOIN_SYMBOL = "UNC";
-    string public constant UNICOIN_NAME = "UNCollaboration Coin";
-    uint8 public constant UNICOIN_DECIMALS = 18;
-
-    uint256 private _totalSupply;
+    uint256 public constant TOTAL_UNICOINS = 21000000 * 10 ** 18;
     uint256 public stakingFeePercentage = 0; // Initialize staking fee to 0%
 
     CollaborationTask[] public tasks;
@@ -61,9 +56,8 @@ contract UNCollaboration is ERC20, Ownable, ReentrancyGuard {
     event TokensMinted(address indexed receiver, uint256 amount);
     event StakingFeePercentageChanged(uint256 newPercentage);
 
-    constructor(address badgeContractAddress) ERC20(UNICOIN_NAME, UNICOIN_SYMBOL) {
-        _totalSupply = TOTAL_UNICOINS * 10 ** UNICOIN_DECIMALS;
-        _mint(msg.sender, _totalSupply);
+    constructor(address badgeContractAddress) ERC20("UNCollaboration Coin", "UNC") {
+        _mint(msg.sender, TOTAL_UNICOINS);
 
         badgeContract = UNBadge(badgeContractAddress);
 
@@ -116,7 +110,7 @@ contract UNCollaboration is ERC20, Ownable, ReentrancyGuard {
 
     function mintTokens(address receiver, uint256 amount) public {
         require(projectManagers[msg.sender], "Only project managers can mint tokens");
-        require(totalSupply().add(amount) <= TOTAL_UNICOINS * 10 ** UNICOIN_DECIMALS, "Minting would exceed total supply");
+        require(totalSupply().add(amount) <= TOTAL_UNICOINS, "Minting would exceed total supply");
         _mint(receiver, amount);
         emit TokensMinted(receiver, amount);
     }
