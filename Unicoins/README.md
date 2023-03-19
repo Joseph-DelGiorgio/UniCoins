@@ -1,39 +1,52 @@
-UNCollaboration Coin & Badge
-This repository contains the smart contract code for the UNCollaboration Coin (UNC) and the UNCollaboration Badge (UNB). The UNCollaboration Coin is an ERC20 token used for rewarding volunteers for their contributions to various projects, while the UNCollaboration Badge is an ERC721 token awarded to volunteers as a recognition of their contributions in terms of hours.
+UNCollaboration Smart Contract
+This is a Solidity smart contract for a collaborative platform called UNCollaboration. The platform aims to incentivize volunteer work by providing a way for volunteers to earn tokens called UNicoin by completing tasks proposed by project managers. The contract also supports staking and project proposals.
 
 Features
+Adding tasks with a description and a reward amount.
+Completing tasks and rewarding the volunteer with UNicoin tokens.
+Adding and awarding badges to volunteers who have contributed a certain number of hours to a project.
+Adding volunteers and project managers.
+Minting UNicoin tokens by project managers.
+Proposing projects and staking UNicoin tokens to validate the proposal.
+Validating and updating project deliverables.
+Forfeiting staked UNicoin tokens if the project deliverables are not met.
 
-Project managers can create collaboration tasks with rewards in UNCollaboration Coins.
-Volunteers can complete tasks and receive rewards in UNCollaboration Coins.
-Project managers can mint new UNCollaboration Coins.
-Project managers can award badges to volunteers for their contributions.
-Volunteers can propose new projects by staking UNCollaboration Coins.
-Project managers can validate proposed projects and update project deliverables.
-Staking fee percentage can be updated by the contract owner.
-Getting Started
-To interact with the smart contracts, you need to have a local Ethereum development environment setup, like Truffle.
+Data Structures
+The contract defines the following data structures:
 
-Install the dependencies: npm install
-Compile the contracts: truffle compile
-Deploy the contracts: truffle migrate
-Interact with the contracts using Truffle console: truffle console
-Contracts
+CollaborationTask: Contains information about a task, such as the project manager who created it, the description, the reward amount, the volunteer who completed it, and whether it has been completed or not.
 
-UNCollaboration: The UNCollaboration contract inherits from ERC20, Ownable, and ReentrancyGuard. It contains the main functionalities for managing tasks, volunteers, project managers, and staking.
-UNBadge: The UNBadge contract inherits from ERC721 and Ownable. It is responsible for minting badges and storing the data related to each badge, including hours contributed and badge level.
+Badge: Contains information about a badge, such as the description and the number of hours contributed by a volunteer.
+UNicoinBalance: Contains information about a volunteer's UNicoin balance, including the balance amount, the badges earned, and the hours contributed to projects.
+
+StakingPosition: Contains information about a staking position, such as the staker, the staked amount, the start time, and the end time.
+ProjectProposal: Contains information about a project proposal, such as the proposer, the description, the staked amount, and whether it has been validated and its deliverables met.
+
+Dependencies
+The contract uses the following dependencies:
+
+ERC20: OpenZeppelin contract for the ERC20 token standard.
+ERC721: OpenZeppelin contract for the ERC721 token standard.
+SafeMath: OpenZeppelin library for safe arithmetic operations.
+ReentrancyGuard: OpenZeppelin contract for preventing reentrant calls.
+Ownable: OpenZeppelin contract for contract ownership.
+
 Events
+The contract emits the following events:
 
-TaskAdded: Emitted when a new task is added.
-TaskCompleted: Emitted when a task is completed by a volunteer.
-VolunteerAdded: Emitted when a new volunteer is added.
-ProjectManagerAdded: Emitted when a new project manager is added.
-TokensMinted: Emitted when new UNCollaboration Coins are minted.
-StakingFeePercentageChanged: Emitted when the staking fee percentage is updated.
-ProjectProposed: Emitted when a new project is proposed by a volunteer.
-ProjectValidated: Emitted when a project is validated by a project manager.
-ProjectDeliverablesUpdated: Emitted when the project deliverables are updated by a project manager.
-Testing
-To run the tests for the smart contracts, use the following command: truffle test
+TaskAdded: Fired when a new task is added.
+TaskCompleted: Fired when a task is completed.
+VolunteerAdded: Fired when a new volunteer is added.
+ProjectManagerAdded: Fired when a new project manager is added.
+TokensMinted: Fired when UNicoin tokens are minted.
+StakingFeePercentageChanged: Fired when the staking fee percentage is changed.
+ProjectProposalAdded: Fired when a new project proposal is added.
+ProjectProposalValidated: Fired when a project proposal is validated.
+ProjectDeliverablesUpdated: Fired when a project's deliverables are updated.
+ProjectStakeForfeited: Fired when a project's staked UNicoin tokens are forfeited.
+
+Contracts
+The contract also includes a separate contract called UNBadge, which is used for creating and managing badges. This contract is also an ERC721 contract and is owned by the same owner as the main contract.
 
 License
-The smart contract code is licensed under the UNLICENSED license.
+This contract is licensed under the UNLICENSED license.
