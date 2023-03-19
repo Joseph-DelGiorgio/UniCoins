@@ -17,9 +17,11 @@ The contract defines the following data structures:
 CollaborationTask: Contains information about a task, such as the project manager who created it, the description, the reward amount, the volunteer who completed it, and whether it has been completed or not.
 
 Badge: Contains information about a badge, such as the description and the number of hours contributed by a volunteer.
+
 UNicoinBalance: Contains information about a volunteer's UNicoin balance, including the balance amount, the badges earned, and the hours contributed to projects.
 
 StakingPosition: Contains information about a staking position, such as the staker, the staked amount, the start time, and the end time.
+
 ProjectProposal: Contains information about a project proposal, such as the proposer, the description, the staked amount, and whether it has been validated and its deliverables met.
 
 Dependencies
@@ -49,4 +51,4 @@ Contracts
 The contract also includes a separate contract called UNBadge, which is used for creating and managing badges. This contract is also an ERC721 contract and is owned by the same owner as the main contract.
 
 License
-This contract is licensed under the UNLICENSED license.
+This contract is licensed as the UNLICENSED license.
