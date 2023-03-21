@@ -1,14 +1,13 @@
 import React from 'react';
+import { Container } from 'react-bootstrap';
 
-function Home() {
-  return (
-    <div className="home">
-      <h1>Welcome to UNCollaboration</h1>
-      <p>
-        This is a platform to collaborate on projects, participate in tasks, and earn rewards.
-      </p>
-    </div>
-  );
-}
+const Home = () => (
+  <Container>
+    <h1>Welcome to UNCollaboration</h1>
+    <p>
+      This is a platform to collaborate on projects, participate in tasks, and earn rewards.
+    </p>
+  </Container>
+);
 
 export default Home;
