@@ -14,28 +14,37 @@ export function Web3Provider({ children }) {
   const [contract, setContract] = useState();
 
   useEffect(() => {
-    if (window.ethereum) {
-      const web3Instance = new Web3(window.ethereum);
-      setWeb3(web3Instance);
-    } else {
-      alert('Please install MetaMask to use this app.');
-    }
+    const initWeb3 = async () => {
+      if (window.ethereum) {
+        const web3Instance = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWeb3(web3Instance);
+      } else {
+        alert('Please install MetaMask to use this app.');
+      }
+    };
+    initWeb3();
   }, []);
 
   useEffect(() => {
     const loadBlockchainData = async () => {
+      if (!web3) return;
+
       const accounts = await web3.eth.getAccounts();
       setAccount(accounts[0]);
 
       const networkId = await web3.eth.net.getId();
-      const contractAddress = UNCollaborationABI.networks[networkId].address;
-      const contractInstance = new web3.eth.Contract(UNCollaborationABI.abi, contractAddress);
-      setContract(contractInstance);
+      const contractData = UNCollaborationABI.networks[networkId];
+
+      if (contractData) {
+        const contractInstance = new web3.eth.Contract(UNCollaborationABI.abi, contractData.address);
+        setContract(contractInstance);
+      } else {
+        alert('UNCollaboration contract not deployed on the connected network.');
+      }
     };
 
-    if (web3) {
-      loadBlockchainData();
-    }
+    loadBlockchainData();
   }, [web3]);
 
   const value = {
@@ -46,3 +55,4 @@ export function Web3Provider({ children }) {
 
   return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
 }
+
