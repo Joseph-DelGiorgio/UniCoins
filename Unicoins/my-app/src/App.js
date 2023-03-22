@@ -2,11 +2,12 @@ import { Web3Provider } from './contexts/Web3Context';
 import Navbar from './components/Navbar';
 import Tasks from './components/Tasks';
 import Projects from './components/Projects';
-import './App.css';
+//import './App.css';
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import UNCollaborationABI from './UNCollaborationABI.json';
 import UNBadgeABI from './UNBadgeABI.json';
+import './styles.css';
 
 const UNCollaborationAddress = 'REPLACE_WITH_UNCOLLABORATION_CONTRACT_ADDRESS';
 const UNBadgeAddress = 'REPLACE_WITH_UNBADGE_CONTRACT_ADDRESS';
