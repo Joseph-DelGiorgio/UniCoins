@@ -1,7 +1,7 @@
 UNCollaboration: A Collaborative Platform for Volunteers
 This Solidity smart contract powers a collaborative platform called UNCollaboration. The platform is designed to incentivize volunteer work by providing a way for volunteers to earn tokens called UNicoin by completing tasks proposed by project managers. The contract also supports staking and project proposals.
 
-Features
+Features: 
 Adding tasks with a description and a reward amount
 Completing tasks and rewarding volunteers with UNicoin tokens
 Adding and awarding badges to volunteers who have contributed a certain number of hours to a project
@@ -26,7 +26,7 @@ ERC721: OpenZeppelin contract for the ERC721 token standard
 SafeMath: OpenZeppelin library for safe arithmetic operations
 ReentrancyGuard: OpenZeppelin contract for preventing reentrant calls
 Ownable: OpenZeppelin contract for contract ownership
-Events
+Events: 
 The contract emits the following events:
 
 TaskAdded: Fired when a new task is added
@@ -39,13 +39,14 @@ ProjectProposalAdded: Fired when a new project proposal is added
 ProjectProposalValidated: Fired when a project proposal is validated
 ProjectDeliverablesUpdated: Fired when a project's deliverables are updated
 ProjectStakeForfeited: Fired when a project's staked UNicoin tokens are forfeited
-Contracts
+
+Contracts: 
 The contract also includes a separate contract called UNBadge, which is used for creating and managing badges. This contract is also an ERC721 contract and is owned by the same owner as the main contract.
 
-License
+License: 
 This contract is licensed under the UNLICENSED license.
 
-Getting Started
+Getting Started: 
 To interact with this smart contract for the first time, follow these steps:
 
 Deploy the UNBadge contract: Deploy the UNBadge contract first, as it will be required while deploying the UNCollaboration contract.
@@ -61,7 +62,7 @@ Complete tasks: As a volunteer assigned to a task, complete the task using the c
 Award badges: As a project manager, award badges to volunteers using the awardBadge(address volunteer, uint256 tokenId, string memory badgeDescription, uint256 hoursContributed) function.
 You can also interact with other functions depending on your use case.
 
-How to Stake
+How to Stake: 
 When proposing a project, the volunteer stakes a specified amount of tokens. Here's how you stake tokens when proposing a project:
 
 Make sure you are a volunteer: You must be added as a volunteer by a project manager using the addVolunteer(address volunteer) function.
