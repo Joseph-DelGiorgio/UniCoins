@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWeb3 } from '../contexts/Web3Context';
-import { Container, Table, Button, Form } from 'react-bootstrap';
+import { Container, Table, Button } from 'react-bootstrap';
 
 function Tasks() {
   const { web3, account, contract } = useWeb3();
@@ -8,14 +8,18 @@ function Tasks() {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (contract) {
+      if (!contract) return;
+
+      try {
         const taskCount = await contract.methods.tasksCount().call();
-        const fetchedTasks = [];
-        for (let i = 0; i < taskCount; i++) {
-          const task = await contract.methods.tasks(i).call();
-          fetchedTasks.push(task);
-        }
+        const fetchedTasks = await Promise.all(
+          Array.from({ length: taskCount }, (_, i) =>
+            contract.methods.tasks(i).call()
+          )
+        );
         setTasks(fetchedTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
       }
     };
 
@@ -23,8 +27,16 @@ function Tasks() {
   }, [contract]);
 
   const handleTaskCompletion = async (taskIndex) => {
-    await contract.methods.completeTask(taskIndex).send({ from: account });
-    window.location.reload();
+    try {
+      await contract.methods.completeTask(taskIndex).send({ from: account });
+      setTasks(
+        tasks.map((task, index) =>
+          index === taskIndex ? { ...task, completed: true } : task
+        )
+      );
+    } catch (error) {
+      console.error('Error completing task:', error);
+    }
   };
 
   return (
