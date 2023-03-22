@@ -1,31 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { useWeb3 } from '../contexts/Web3Context';
-import { Container, Table, Button, Form } from 'react-bootstrap';
+import { Container, Table } from 'react-bootstrap';
 
 function Projects() {
-  const { web3, account, contract } = useWeb3();
+  const { web3, contract } = useWeb3();
   const [proposals, setProposals] = useState([]);
 
   useEffect(() => {
     const fetchProposals = async () => {
-      if (contract) {
-        try {
-          const proposalCount = await contract.methods.nextProposalId().call();
-          const fetchedProposals = [];
-          for (let i = 0; i < proposalCount; i++) {
-            const proposal = await contract.methods.projectProposals(i).call();
-            fetchedProposals.push(proposal);
-          }
-          setProposals(fetchedProposals);
-        } catch (error) {
-          console.error('Error fetching proposals:', error);
-        }
+      if (!contract) return;
+
+      try {
+        const proposalCount = await contract.methods.nextProposalId().call();
+        const fetchedProposals = await Promise.all(
+          Array.from({ length: proposalCount }, (_, i) =>
+            contract.methods.projectProposals(i).call()
+          )
+        );
+        setProposals(fetchedProposals);
+      } catch (error) {
+        console.error('Error fetching proposals:', error);
       }
     };
-  
+
     fetchProposals();
   }, [contract]);
-  
+
+  const renderStatus = (proposal) => {
+    if (!proposal.validated) return 'Pending Validation';
+    return proposal.deliverablesMet ? 'Deliverables Met' : 'Deliverables Not Met';
+  };
 
   return (
     <Container>
@@ -45,13 +49,7 @@ function Projects() {
               <td>{index}</td>
               <td>{proposal.projectDescription}</td>
               <td>{web3.utils.fromWei(proposal.stakedAmount, 'ether')} UNC</td>
-              <td>
-                {proposal.validated
-                  ? proposal.deliverablesMet
-                    ? 'Deliverables Met'
-                    : 'Deliverables Not Met'
-                  : 'Pending Validation'}
-              </td>
+              <td>{renderStatus(proposal)}</td>
             </tr>
           ))}
         </tbody>
@@ -61,4 +59,5 @@ function Projects() {
 }
 
 export default Projects;
+
 
