@@ -14,8 +14,3 @@
     "chai": "^4.3.4"
   }
 }
-
-/*
-run the tests with npm test or yarn test after installing the 
-required dependencies by running npm install or yarn install.
-*/
