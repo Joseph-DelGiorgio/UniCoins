@@ -20,3 +20,8 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+/* 
+npm install --save-dev @openzeppelin/contracts
+npm install --save-dev ethers
+*/
