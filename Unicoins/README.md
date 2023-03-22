@@ -1,4 +1,4 @@
-UNCollaboration Smart Contract
+
 This is a Solidity smart contract for a collaborative platform called UNCollaboration. The platform aims to incentivize volunteer work by providing a way for volunteers to earn tokens called UNicoin by completing tasks proposed by project managers. The contract also supports staking and project proposals.
 
 Features
