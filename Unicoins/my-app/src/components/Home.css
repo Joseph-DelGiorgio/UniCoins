@@ -1,0 +1,19 @@
+.home-content {
+  text-align: center;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.display-4 {
+  margin-bottom: 1.5rem;
+}
+
+.lead {
+  margin-bottom: 1.5rem;
+}
+
+hr.my-4 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-color: rgba(0, 0, 0, 0.1);
+}
