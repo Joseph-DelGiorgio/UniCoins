@@ -54,6 +54,12 @@ License
 This contract is licensed as the UNLICENSED license.
 
 
+
+
+
+
+
+
 To interact with this smart contract for the first time, follow these steps:
 
 Deploy the UNBadge contract: Deploy the UNBadge contract first, as it will be required while deploying the UNCollaboration contract.
@@ -79,3 +85,23 @@ Complete tasks: As a volunteer assigned to a task, complete the task using the c
 Award badges: As a project manager, award badges to volunteers using the awardBadge(address volunteer, uint256 tokenId, string memory badgeDescription, uint256 hoursContributed) function.
 
 You can also interact with other functions depending on your use case.
+
+
+
+
+
+
+
+
+
+
+How to stake:
+When proposing a project, the volunteer stakes a specified amount of tokens. Here's how you stake tokens when proposing a project:
+
+Make sure you are a volunteer: You must be added as a volunteer by a project manager using the addVolunteer(address volunteer) function.
+
+Ensure you have enough tokens: Check your token balance using the balanceOf(address account) function from the ERC20 contract. You need to have enough tokens in your balance to stake the specified amount.
+
+Propose a project: As a volunteer, call the proposeProject(string memory projectDescription, uint256 stakingAmount) function, where projectDescription is a description of the project, and stakingAmount is the amount of tokens you want to stake. The specified amount of tokens will be transferred from your balance to the contract and will be locked as a stake.
+
+The staked tokens will be returned to the proposer if the project deliverables are met, as determined by the project manager. If the deliverables are not met, the staked tokens will be forfeited (burned).
