@@ -52,3 +52,30 @@ The contract also includes a separate contract called UNBadge, which is used for
 
 License
 This contract is licensed as the UNLICENSED license.
+
+
+To interact with this smart contract for the first time, follow these steps:
+
+Deploy the UNBadge contract: Deploy the UNBadge contract first, as it will be required while deploying the UNCollaboration contract.
+
+Deploy the UNCollaboration contract: Deploy the UNCollaboration contract with the UNBadge contract's address as a constructor parameter.
+
+(Optional) Add more project managers: If needed, the current project manager (the contract deployer) can add new project managers using the addProjectManager(address projectManager) function.
+
+Add volunteers: As a project manager, you can add volunteers using the addVolunteer(address volunteer) function.
+
+(Optional) Mint tokens for volunteers: Project managers can mint tokens for volunteers using the mintTokens(address receiver, uint256 amount) function.
+
+Create tasks: As a project manager, you can create tasks using the addTask(string memory taskDescription, uint256 reward, address volunteer) function. Assign a volunteer to the task by providing their address.
+
+Volunteers propose projects: As a volunteer, you can propose projects using the proposeProject(string memory projectDescription, uint256 stakingAmount) function. You need to have enough tokens in your balance to stake the specified amount.
+
+Validate project proposals: As a project manager, validate project proposals using the validateProposal(uint256 proposalId, bool isValid) function.
+
+Update project deliverables: As a project manager, update the project deliverables using the updateProjectDeliverables(uint256 proposalId, bool deliverablesMet) function.
+
+Complete tasks: As a volunteer assigned to a task, complete the task using the completeTask(uint256 taskIndex) function.
+
+Award badges: As a project manager, award badges to volunteers using the awardBadge(address volunteer, uint256 tokenId, string memory badgeDescription, uint256 hoursContributed) function.
+
+You can also interact with other functions depending on your use case.
