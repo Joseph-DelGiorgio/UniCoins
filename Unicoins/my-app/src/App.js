@@ -19,18 +19,17 @@ const App = () => {
   const [UNBadgeContract, setUNBadgeContract] = useState(null);
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    const initWeb3 = async () => {
-      if (window.ethereum) {
-        const web3Instance = new Web3(window.ethereum);
-        setWeb3(web3Instance);
-      } else {
-        console.log('Please install MetaMask!');
-      }
-    };
+ useEffect(() => {
+  const initWeb3 = async () => {
+    if (window.ethereum) {
+      const web3Instance = new Web3(window.ethereum);
+      setWeb3(web3Instance);
+     } else {
+      console.log('Please install MetaMask!');
+      // Consider displaying an alert or notification to the user about the missing Web3 provider.
+     }
+   };
 
-    initWeb3();
-  }, []);
 
   useEffect(() => {
     const initContracts = async () => {
