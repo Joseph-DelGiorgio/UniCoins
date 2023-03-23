@@ -66,21 +66,40 @@ const App = () => {
     fetchTasks();
   }, [UNCollaborationContract]);
 
-  // Add other functions like addTask, completeTask, awardBadge, etc., using the smart contract's methods.
+  const addTask = async (taskDescription, reward, volunteer) => {
+    if (UNCollaborationContract) {
+      await UNCollaborationContract.methods
+        .addTask(taskDescription, reward, volunteer)
+        .send({ from: account });
+    }
+  };
+
+  const completeTask = async (taskIndex) => {
+    if (UNCollaborationContract) {
+      await UNCollaborationContract.methods
+        .completeTask(taskIndex)
+        .send({ from: account });
+    }
+  };
+
+  const awardBadge = async (volunteer, tokenId, badgeDescription, hoursContributed) => {
+    if (UNBadgeContract) {
+      await UNBadgeContract.methods
+        .awardBadge(volunteer, tokenId, badgeDescription, hoursContributed)
+        .send({ from: account });
+    }
+  };
 
   return (
-    <div>
-      <h1>UNCollaboration Platform</h1>
-      <h2>Tasks</h2>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index}>
-            {task.taskDescription} - Reward: {task.reward} UNCs - Status: {task.completed ? 'Completed' : 'Incomplete'}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Web3Provider value={{ web3, account, UNCollaborationContract, UNBadgeContract }}>
+      <div className="App">
+        <Navbar />
+        <Tasks tasks={tasks} addTask={addTask} completeTask={completeTask} />
+        <Projects awardBadge={awardBadge} />
+      </div>
+    </Web3Provider>
   );
 };
 
 export default App;
+
