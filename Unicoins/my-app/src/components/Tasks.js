@@ -1,77 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { useWeb3 } from '../contexts/Web3Context';
-import { Container, Table, Button } from 'react-bootstrap';
+import React, { useState } from 'react';
+import Task from './Task';
+import Modal from 'react-modal';
 
-function Tasks() {
-  const { web3, account, contract } = useWeb3();
-  const [tasks, setTasks] = useState([]);
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      if (!contract) return;
+Modal.setAppElement('#root');
 
-      try {
-        const taskCount = await contract.methods.tasksCount().call();
-        const fetchedTasks = await Promise.all(
-          Array.from({ length: taskCount }, (_, i) =>
-            contract.methods.tasks(i).call()
-          )
-        );
-        setTasks(fetchedTasks);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
+const Tasks = ({ tasks, addTask, completeTask }) => {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [taskDescription, setTaskDescription] = useState('');
+  const [reward, setReward] = useState('');
+  const [volunteer, setVolunteer] = useState('');
 
-    fetchTasks();
-  }, [contract]);
+  const openModal = () => {
+    setModalIsOpen(true);
+  };
 
-  const handleTaskCompletion = async (taskIndex) => {
-    try {
-      await contract.methods.completeTask(taskIndex).send({ from: account });
-      setTasks(
-        tasks.map((task, index) =>
-          index === taskIndex ? { ...task, completed: true } : task
-        )
-      );
-    } catch (error) {
-      console.error('Error completing task:', error);
-    }
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await addTask(taskDescription, reward, volunteer);
+    setTaskDescription('');
+    setReward('');
+    setVolunteer('');
+    closeModal();
   };
 
   return (
-    <Container>
-      <h1>Tasks</h1>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Task Description</th>
-            <th>Reward</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task, index) => (
-            <tr key={index}>
-              <td>{index}</td>
-              <td>{task.taskDescription}</td>
-              <td>{web3.utils.fromWei(task.reward, 'ether')} UNC</td>
-              <td>{task.completed ? 'Completed' : 'Pending'}</td>
-              <td>
-                {!task.completed && (
-                  <Button variant="success" onClick={() => handleTaskCompletion(index)}>
-                    Complete
-                  </Button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
+    <div className="container">
+      <h2>Tasks</h2>
+      <button onClick={openModal} className="btn btn-primary">
+        Create Task
+      </button>
+      <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles} contentLabel="Task Modal">
+        <h3>Create Task</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="taskDescription">Task Description:</label>
+            <input
+              type="text"
+              id="taskDescription"
+              className="form-control"
+              value={taskDescription}
+              onChange={(e) => setTaskDescription(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="reward">Reward:</label>
+            <input
+              type="number"
+              id="reward"
+              className="form-control"
+              value={reward}
+              onChange={(e) => setReward(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="volunteer">Volunteer Address:</label>
+            <input
+              type="text"
+              id="volunteer"
+              className="form-control"
+              value={volunteer}
+              onChange={(e) => setVolunteer(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-success">
+            Submit
+          </button>
+          <button onClick={closeModal} className="btn btn-danger" style={{ marginLeft: '10px' }}>
+            Cancel
+          </button>
+        </form>
+      </Modal>
+      <ul>
+        {tasks.map((task, index) => (
+          <Task key={index} index={index} task={task} completeTask={completeTask} />
+        ))}
+      </ul>
+    </div>
   );
-}
+};
 
 export default Tasks;
+
